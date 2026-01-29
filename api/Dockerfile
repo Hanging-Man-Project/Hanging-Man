@@ -1,25 +1,16 @@
-# 1. Utilisation d'une image de base légère
-FROM python:3.13.1-slim
+FROM python:3.12-slim
 
-# 2. Définition du répertoire de travail
+RUN useradd -m appuser
 WORKDIR /app
 
-# 3. Installation des dépendances
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. Copie du code source
-COPY . .
+COPY app.py .
 
-# 5. Sécurité : Ne pas exécuter en tant que root
-RUN useradd -m devopsuser
-USER devopsuser
+USER appuser
+EXPOSE 8000
 
-# 6. Documentation du port
-EXPOSE 8080
+HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
-# 7. Lancement de l'application
-CMD ["python", "app.py"]
-
-#docker build -t image_exo_2 .
-#docker run -p 8080:8080 image_exo_2
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

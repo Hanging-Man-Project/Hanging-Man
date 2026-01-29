@@ -1,10 +1,11 @@
-from flask import Flask
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
-def hello():
-    return "Hello DevOps!"
+@app.get("/")
+def root():
+    return {"message": "API is running"}
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+@app.get("/health")
+def health():
+    return {"status": "ok"}
