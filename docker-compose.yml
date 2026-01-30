@@ -5,9 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: hangman-api
     ports: 
-      - "8080:8080"
+      - "8000:8000"
     environment:
-      - PORT=8080
+      - PORT=8000
       - DATA_PATH=/data/secret_word.txt
     volumes:
       - game_data:/data
