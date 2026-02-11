@@ -1,0 +1,62 @@
+name: CI/CD Docker Stack
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Build API
+      - name: Build API image
+        run: |
+          docker build -t $DOCKERHUB_USERNAME/api:${GITHUB_SHA} ./api
+
+      # Build Worker
+      - name: Build Worker image
+        run: |
+          docker build -t $DOCKERHUB_USERNAME/worker:${GITHUB_SHA} ./worker
+
+      # Build Proxy
+      - name: Build Proxy image
+        run: |
+          docker build -t $DOCKERHUB_USERNAME/proxy:${GITHUB_SHA} ./proxy
+
+      # Run tests
+      - name: Run container tests
+        run: |
+          docker run --rm $DOCKERHUB_USERNAME/api:${GITHUB_SHA} whoami
+          docker run --rm $DOCKERHUB_USERNAME/api:${GITHUB_SHA} ls /app
+          # Test HTTP endpoint using curl
+          docker network create cicd-net || true
+          docker run -d --name api_test --network cicd-net $DOCKERHUB_USERNAME/api:${GITHUB_SHA}
+          docker run --rm --network cicd-net curlimages/curl:8.2.1 http://api_test:8000/health
+          docker rm -f api_test
+
+      # Log in to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Push images
+      - name: Push API image
+        run: docker push $DOCKERHUB_USERNAME/api:${GITHUB_SHA}
+      - name: Push Worker image
+        run: docker push $DOCKERHUB_USERNAME/worker:${GITHUB_SHA}
+      - name: Push Proxy image
+        run: docker push $DOCKERHUB_USERNAME/proxy:${GITHUB_SHA}

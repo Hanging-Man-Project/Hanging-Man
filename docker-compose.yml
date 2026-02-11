@@ -1,22 +1,55 @@
+version: "3.9"
+
 services:
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
-    container_name: hangman-api
-    ports: 
-      - "8000:8000"
-    environment:
-      - PORT=8000
-      - DATA_PATH=/data/secret_word.txt
-    volumes:
-      - game_data:/data
+    container_name: api
     networks:
-      - internal_net
-    restart: unless-stopped
+      - appnet
+    environment:
+      - APP_ENV=dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      retries: 5
+      timeout: 3s
 
-volumes:
-  game_data:
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: worker
+    networks:
+      - appnet
+    depends_on:
+      - api
+    restart: "no" 
+    environment:
+      - WORKER_MODE=batch
+
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    container_name: proxy
+    networks:
+      - appnet
+    depends_on:
+      - api
+    ports:
+      - "${PROXY_PORT}:8080" 
+    environment:
+      - PROXY_BACKEND_HOST=api
+      - PROXY_BACKEND_PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 5s
+      retries: 5
+      timeout: 3s
 
 networks:
-  internal_net:
+  appnet:
+    driver: bridge
