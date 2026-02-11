@@ -45,25 +45,26 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/proxy:${{ github.sha }}
 
-      # Run container tests after images are pushed
-      - name: Run container tests
+      # Run API container and test
+      - name: Run API container and test
         run: |
-          # Create isolated network
-          docker network create cicd-net || true
+          # Run API container on localhost:8000
+          docker run -d --name api_test -p 8000:8000 ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
 
-          # Run API container
-          docker run -d --name api_test --network cicd-net ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
+          # Wait until the API is ready (max 30s)
+          for i in {1..6}; do
+            if curl --fail http://localhost:8000/health; then
+              echo "API is ready!"
+              break
+            else
+              echo "Waiting for API..."
+              sleep 5
+            fi
+          done
 
-          # Wait a few seconds for the container to start
-          sleep 5
-
-          # Check HTTP endpoint
-          curl --fail http://api_test:8000/health
-
-          # Check file structure and user
+          # Check container internals
           docker exec api_test whoami
           docker exec api_test ls /app
 
           # Cleanup
           docker rm -f api_test
-          docker network rm cicd-net
