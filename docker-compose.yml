@@ -12,7 +12,7 @@ services:
       - APP_ENV=dev
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 5s
+      interval: 60s
       retries: 5
       timeout: 3s
 
@@ -46,7 +46,7 @@ services:
       - PROXY_BACKEND_PORT=8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 5s
+      interval: 60s
       retries: 5
       timeout: 3s
 
