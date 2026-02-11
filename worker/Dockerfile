@@ -4,6 +4,7 @@ RUN useradd -m worker
 WORKDIR /app
 
 COPY worker.py .
+COPY words_dictionary.txt .
 
 USER worker
 

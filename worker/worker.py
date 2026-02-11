@@ -2,10 +2,16 @@ import random
 import time
 
 def get_random_word():
-    with open("words_dictionary.txt", "r") as dict_file:
-        words = dict_file.read().splitlines()
-    return random.choice(words)
+    try:
+        with open("words_dictionary.txt", "r") as dict_file:
+            words = dict_file.read().splitlines()
+            return random.choice(words)
+    except FileNotFoundError:
+        return "ERREUR: Fichier introuvable"
 
 print("Worker started")
-print(get_random_word())
+
+word = get_random_word()
+print(word)
+
 print("Worker exiting cleanly")
