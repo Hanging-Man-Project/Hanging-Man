@@ -9,9 +9,6 @@ on:
 jobs:
   build-test-push:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     steps:
       - name: Checkout repo
@@ -23,8 +20,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Build & Push images
       - name: Build & Push API image
@@ -32,21 +29,21 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
 
       - name: Build & Push Worker image
         uses: docker/build-push-action@v5
         with:
           context: ./worker
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/worker:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ github.sha }}
 
       - name: Build & Push Proxy image
         uses: docker/build-push-action@v5
         with:
           context: ./proxy
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/proxy:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/proxy:${{ github.sha }}
 
       # Run container tests after images are pushed
       - name: Run container tests
@@ -55,7 +52,7 @@ jobs:
           docker network create cicd-net || true
 
           # Run API container
-          docker run -d --name api_test --network cicd-net ${{ env.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
+          docker run -d --name api_test --network cicd-net ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
 
           # Wait a few seconds for the container to start
           sleep 5
