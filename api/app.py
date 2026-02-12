@@ -35,27 +35,34 @@ def health():
 
 @app.post("/start", response_model=GameStatus)
 async def start_game(request: StartGameRequest = StartGameRequest()):
-    """Démarre une nouvelle partie avec le mot du worker"""
-    global word
+    """Démarre une nouvelle partie avec un mot aléatoire du worker"""
     
-    # Vérification qu'un mot a été fourni par le worker
-    if not word:
+    # Récupération d'un mot aléatoire depuis le worker
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get("http://worker:5001/random-word", timeout=5.0)
+            response.raise_for_status()
+            word = response.json().get("word", "").upper()
+    except Exception as e:
         raise HTTPException(
             status_code=503, 
-            detail="Aucun mot disponible. Le worker n'a pas encore fourni de mot."
+            detail=f"Impossible de récupérer un mot depuis le worker: {str(e)}"
         )
+    
+    if not word:
+        raise HTTPException(status_code=500, detail="Aucun mot reçu du worker")
     
     # Création d'une nouvelle partie
     game_id = str(uuid.uuid4())
     games[game_id] = {
-        "word": word.upper(),
+        "word": word,
         "guessed_letters": set(),
         "attempts_left": request.max_attempts,
         "status": "in_progress"
     }
     
     # Construction du mot masqué initial
-    masked_word = " ".join(["_" if c.isalpha() else c for c in word.upper()])
+    masked_word = " ".join(["_" if c.isalpha() else c for c in word])
     
     return GameStatus(
         game_id=game_id,

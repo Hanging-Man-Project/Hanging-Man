@@ -26,9 +26,9 @@ services:
       - appnet
     depends_on:
       - api
-    restart: "no" 
+    restart: unless-stopped
     environment:
-      - WORKER_MODE=batch
+      - WORKER_MODE=service
 
   proxy:
     build:
