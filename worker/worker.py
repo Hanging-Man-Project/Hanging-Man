@@ -1,17 +1,26 @@
 import random
-import time
+from fastapi import FastAPI, HTTPException
 
-def get_random_word():
+print("Worker started")
+
+app = FastAPI()
+
+def get_random_word() -> str | None:
     try:
         with open("words_dictionary.txt", "r") as dict_file:
             words = dict_file.read().splitlines()
             return random.choice(words)
     except FileNotFoundError:
-        return "ERREUR: Fichier introuvable"
+        return None
 
-print("Worker started")
+@app.get("/random-word")
+def random_word():
+    word = get_random_word()
 
-word = get_random_word()
-print(word)
+    if not word:
+        raise HTTPException(status_code=404, detail="Aucun mot trouvé")
+
+    return {"word": word}
+
 
 print("Worker exiting cleanly")
