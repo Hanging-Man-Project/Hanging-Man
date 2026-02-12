@@ -15,18 +15,20 @@ def health():
     return {"status": "ok"}
 
 @app.post("/start")
-async def start_game(request: StartRequest):
+async def start_game():
     async with httpx.AsyncClient() as client:
         try:
+            # Appel au worker sans paramètres
             response = await client.get(WORKER_URL)
             response.raise_for_status()
             data = response.json()
             word = data.get("word", "")
 
+            # Masquage du mot
             masked_word = "_" * len(word)
             
             return {
-                "game_id": str(uuid.uuid4())[:6], 
+                "game_id": str(uuid.uuid4())[:6],
                 "letters": masked_word
             }
         except Exception as e:
