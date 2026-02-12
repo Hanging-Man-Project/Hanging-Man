@@ -12,6 +12,7 @@ def remove_accents(word: str) -> str:
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     
 def get_random_word_from_api() -> str | None:
+    """Récupère un mot aléatoire depuis une API publique."""
     try:
         response = requests.get("https://trouve-mot.fr/api/random", timeout=5)
         raw_word = response.json()[0]['name']
@@ -22,6 +23,7 @@ def get_random_word_from_api() -> str | None:
         return None
 
 def get_random_word_from_dictionary() -> str | None:
+    """Récupère un mot aléatoire depuis un dictionnaire local."""
     try:
         with open("words_dictionary.txt", "r") as dict_file:
             words = dict_file.read().splitlines()
@@ -32,11 +34,10 @@ def get_random_word_from_dictionary() -> str | None:
 
 @app.route("/random-word", methods=["GET"])
 def random_word():
-    """Génère un mot aléatoire"""
+    """Génère un mot aléatoire."""
     word = get_random_word_from_api()
     
     if not word:
-        print("Echec de l'appel à l'API publique, utilisation du dictionnaire local")
         word = get_random_word_from_dictionary()
         if not word:
             return jsonify({"error": "Aucun mot trouvé"}), 500
