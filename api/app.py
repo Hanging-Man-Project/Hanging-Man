@@ -4,32 +4,24 @@ import uuid
 
 app = FastAPI()
 
-WORKER_URL = "http://worker:8000/random-word"
+word : str = ""
 
 @app.get("/")
 def root():
-    return {"message": "API is running"}
+    return {"message": word}
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+        
+@app.get("/random-word/{random_word}")
+def set_word(random_word: str):
+    global word
 
-@app.post("/start")
-async def start_game():
-    async with httpx.AsyncClient() as client:
-        try:
-            # Appel au worker sans paramètres
-            response = await client.get(WORKER_URL)
-            response.raise_for_status()
-            data = response.json()
-            word = data.get("word", "")
-
-            # Masquage du mot
-            masked_word = "_" * len(word)
-            
-            return {
-                "game_id": str(uuid.uuid4())[:6],
-                "letters": masked_word
-            }
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Erreur Worker: {str(e)}")
+    if not random_word:
+        print("No word provided")
+        raise HTTPException(status_code=400, detail="Mot requis")
+    
+    word = random_word
+    
+    return word
