@@ -5,44 +5,40 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-print("🚀 Worker started as API service")
+print("🚀 Worker started.")
 
-def remove_accents(word: str) -> str:
-    nfkd_form = unicodedata.normalize('NFKD', word)
-    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
-    
+   
 def get_random_word_from_api() -> str | None:
-    """Récupère un mot aléatoire depuis une API publique."""
+    """Retrieves a random word from a public API."""
     try:
-        response = requests.get("https://trouve-mot.fr/api/random", timeout=5)
-        raw_word = response.json()[0]['name']
-        word = remove_accents(raw_word)
+        response = requests.get(f"https://random-word-api.herokuapp.com/word?diff={random.randint(1, 2)}", timeout=5)
+        word = response.json()[0]
         return word.upper()
     except requests.RequestException as e:
-        print(f"⚠️ Erreur API publique : {e}")
+        print(f"⚠️ Public API error: {e}")
         return None
 
 def get_random_word_from_dictionary() -> str | None:
-    """Récupère un mot aléatoire depuis un dictionnaire local."""
+    """Retrieves a random word from a local dictionary."""
     try:
         with open("words_dictionary.txt", "r") as dict_file:
             words = dict_file.read().splitlines()
             return random.choice(words).upper()
     except FileNotFoundError:
-        print("⚠️ Dictionnaire local introuvable")
+        print("⚠️ Local dictionary not found.")
         return None
 
 @app.route("/random-word", methods=["GET"])
 def random_word():
-    """Génère un mot aléatoire."""
+    """Generate a random word."""
     word = get_random_word_from_api()
     
     if not word:
         word = get_random_word_from_dictionary()
         if not word:
-            return jsonify({"error": "Aucun mot trouvé"}), 500
+            return jsonify({"error": "❌ No words found"}), 500
 
-    print(f"✅ Mot généré: {word}")
+    print(f"✅ Generated word: {word}")
     return jsonify({"word": word}), 200
 
 @app.route("/health", methods=["GET"])

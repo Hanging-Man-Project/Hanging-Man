@@ -6,7 +6,7 @@ import uuid
 
 app = FastAPI()
 
-# Structure pour stocker les parties en cours (en mémoire)
+# Structure for storing current parts (in memory)
 games: Dict[str, dict] = {}
 
 class StartGameRequest(BaseModel):
@@ -25,19 +25,22 @@ class GameStatus(BaseModel):
 
 word : str = ""
 
+
 @app.get("/")
 def root():
-    return {"message": "Hanging Man API is running", "version": "1.0.0"}
+    return {"message": "🚀 Hanging Man API is running", "version": "1.0.0"}
+
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.post("/start", response_model=GameStatus)
 async def start_game(request: StartGameRequest = StartGameRequest()):
-    """Démarre une nouvelle partie avec un mot aléatoire du worker"""
+    """Start a new game with a random word from the worker."""
     
-    # Récupération d'un mot aléatoire depuis le worker
+    # Retrieving a random word from the worker
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get("http://worker:5001/random-word", timeout=5.0)
@@ -46,13 +49,13 @@ async def start_game(request: StartGameRequest = StartGameRequest()):
     except Exception as e:
         raise HTTPException(
             status_code=503, 
-            detail=f"Impossible de récupérer un mot depuis le worker: {str(e)}"
+            detail=f"❌ Unable to retrieve a word from the worker: {str(e)}"
         )
     
     if not word:
-        raise HTTPException(status_code=500, detail="Aucun mot reçu du worker")
+        raise HTTPException(status_code=500, detail="❌ No word received from the worker")
     
-    # Création d'une nouvelle partie
+    # Creating a new game
     game_id = str(uuid.uuid4())
     games[game_id] = {
         "word": word,
@@ -61,7 +64,7 @@ async def start_game(request: StartGameRequest = StartGameRequest()):
         "status": "in_progress"
     }
     
-    # Construction du mot masqué initial
+    # Construction of the initial hidden word
     masked_word = " ".join(["_" if c.isalpha() else c for c in word])
     
     return GameStatus(
@@ -72,51 +75,53 @@ async def start_game(request: StartGameRequest = StartGameRequest()):
         status="in_progress"
     )
 
+
 @app.post("/guess", response_model=GameStatus)
 async def guess_letter(guess: GuessRequest):
     game_id = guess.game_id
     letter = guess.letter.upper()
 
-    # Vérification de l'existence de la partie
+    # Verification of the existence of the party
     if game_id not in games:
-        raise HTTPException(status_code=404, detail="Partie non trouvée")
+        raise HTTPException(status_code=404, detail="❌ Party not found")
 
     game = games[game_id]
 
-    # Vérification du statut de la partie
+    # Verifying the status of the party
     if game["status"] != "in_progress":
         raise HTTPException(
             status_code=400, 
-            detail=f"La partie est terminée: {game['status']}"
+            detail=f"The game is over: {game['status']}"
         )
 
-    # Validation de la lettre
+    # Letter validation
     if not letter.isalpha():
-        raise HTTPException(status_code=400, detail="Seules les lettres sont autorisées")
+        raise HTTPException(status_code=400, detail="⚠️ Only letters are allowed.")
 
-    # Vérification si la lettre a déjà été devinée
+    # Checking whether the letter has already been guessed
     if letter in game["guessed_letters"]:
-        raise HTTPException(status_code=400, detail="Lettre déjà devinée")
+        raise HTTPException(status_code=400, detail="⚠️ Letter already guessed")
 
-    # Ajout de la lettre aux lettres devinées
+    # Adding the letter to the guessed letters
     game["guessed_letters"].add(letter)
 
-    # Vérification si la lettre est dans le mot
+    # Checking if the letter is in the word
     if letter not in game["word"]:
         game["attempts_left"] -= 1
 
-    # Construction du mot masqué
+    # Construction of the hidden word
     masked_word = " ".join([
         c if c in game["guessed_letters"] or not c.isalpha() else "_"
         for c in game["word"]
     ])
 
-    # Vérification des conditions de victoire/défaite
+    # Checking victory/defeat conditions
     if "_" not in masked_word:
         game["status"] = "won"
+    # Reveal the word if the game is lost
     elif game["attempts_left"] <= 0:
         game["status"] = "lost"
-        masked_word = " ".join(game["word"])  # Révéler le mot
+        masked_word = " ".join(game["word"])
 
     return GameStatus(
         game_id=game_id,
@@ -126,15 +131,16 @@ async def guess_letter(guess: GuessRequest):
         status=game["status"]
     )
 
+
 @app.get("/status/{game_id}", response_model=GameStatus)
 async def get_game_status(game_id: str):
-    """Récupère le statut d'une partie"""
+    """Retrieves the status of a game."""
     if game_id not in games:
-        raise HTTPException(status_code=404, detail="Partie non trouvée")
+        raise HTTPException(status_code=404, detail="❌ Party not found.")
 
     game = games[game_id]
 
-    # Construction du mot masqué
+    # Construction of the hidden word
     if game["status"] == "lost":
         masked_word = " ".join(game["word"])
     else:
@@ -151,18 +157,19 @@ async def get_game_status(game_id: str):
         status=game["status"]
     )
 
+
 @app.delete("/game/{game_id}")
 async def delete_game(game_id: str):
-    """Supprime une partie"""
+    """Deletes a porty."""
     if game_id not in games:
-        raise HTTPException(status_code=404, detail="Partie non trouvée")
+        raise HTTPException(status_code=404, detail="❌ Party not found")
     
     del games[game_id]
-    return {"message": "Partie supprimée", "game_id": game_id}
+    return {"message": "Deleted section", "game_id": game_id}
 
 @app.get("/games")
 async def list_games():
-    """Liste toutes les parties en cours"""
+    """List all ongoing parties."""
     return {
         "total_games": len(games),
         "games": [
@@ -175,13 +182,13 @@ async def list_games():
         ]
     }
 
+
 @app.get("/random-word/{random_word}")
 def set_word(random_word: str):
     global word
 
     if not random_word:
-        print("No word provided")
-        raise HTTPException(status_code=400, detail="Mot requis")
+        raise HTTPException(status_code=400, detail="❌ Required word parameter is missing")
     
     word = random_word
     
