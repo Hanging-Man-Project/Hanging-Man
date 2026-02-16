@@ -11,7 +11,7 @@ print("🚀 Worker started.")
 def get_random_word_from_api() -> str | None:
     """Retrieves a random word from a public API."""
     try:
-        response = requests.get(f"https://random-word-api.herokuapp.com/word?diff={random.randint(1, 2)}", timeout=5)
+        response = requests.get(f"https://random-word-api.herokuapp.com/word?length={random.randint(5, 9)}&diff={random.randint(1, 2)}", timeout=5)
         word = response.json()[0]
         return word.upper()
     except requests.RequestException as e:
