@@ -43,7 +43,7 @@ async def start_game(request: StartGameRequest = StartGameRequest()):
     # Retrieving a random word from the worker
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get("http://worker:5001/random-word", timeout=5.0)
+            response = await client.get("http://worker:5001/random-word", timeout=10.0)
             response.raise_for_status()
             word = response.json().get("word", "").upper()
     except Exception as e:
