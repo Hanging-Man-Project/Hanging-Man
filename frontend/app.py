@@ -193,13 +193,13 @@ with st.sidebar:
     """)
     
     st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
-    st.header("Statistiques")
+    st.header("Statistics")
     
     try:
         response = requests.get(f"{API_URL}/games")
         if response.status_code == 200:
             data = response.json()
-            st.metric("Parties actives", data["total_games"])
+            st.metric("Games played", data["total_games"])
     except:
         st.error("API non disponible")
     
@@ -237,7 +237,7 @@ if st.session_state.game_status:
         # Attempts below the hangman
         st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
         st.progress(game['attempts_left'] / 6)
-        st.markdown(f'<p style="text-align: center; margin-top: 8px; font-size: 13px; color: #86868B;">Tentatives restantes: <span style="color: #5E5CE6; font-weight: 600;">{game["attempts_left"]}/6</span></p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="text-align: center; margin-top: 8px; font-size: 13px; color: #86868B;">Remaining attempts: <span style="color: #5E5CE6; font-weight: 600;">{game["attempts_left"]}/6</span></p>', unsafe_allow_html=True)
     
     # ========== RIGHT COLUMN: Word + Keyboard ==========
     with col_right:
@@ -251,7 +251,7 @@ if st.session_state.game_status:
         # Virtual keyboard (only if game in progress)
         if game['status'] == 'in_progress':
             st.markdown('<div style="height: 16px;"></div>', unsafe_allow_html=True)
-            st.markdown('<p style="text-align: center; color: #86868B; font-size: 12px; margin-bottom: 10px;">Choisissez une lettre</p>', unsafe_allow_html=True)
+            st.markdown('<p style="text-align: center; color: #86868B; font-size: 12px; margin-bottom: 10px;">Select a letter</p>', unsafe_allow_html=True)
             
             alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             guessed = set(game['guessed_letters'])
@@ -299,20 +299,13 @@ if st.session_state.game_status:
         elif game['status'] == 'lost':
             st.markdown('<div class="status-box lose">Perdu !</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div class="status-box in-progress">Partie en cours</div>', unsafe_allow_html=True)
+            st.markdown('<div class="status-box in-progress">Game in progress</div>', unsafe_allow_html=True)
 
 else:
     # Minimalist home screen
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown('<div class="bento-card" style="text-align: center;">', unsafe_allow_html=True)
+        st.markdown('<div>', unsafe_allow_html=True)
         components.html(draw_hangman_svg(6), height=240)
-        st.markdown('<p style="color: #86868B; margin-top: 12px; font-size: 13px;">Click on <strong>New Game</strong> to start</p>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: center; color: #86868B; font-size: 20px;"><strong>Matthieu HOSTE<br>Edouard LAMBERT<br>Henri OMS</strong>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-
-# Footer minimaliste
-st.markdown('<div style="height: 10px;"></div>', unsafe_allow_html=True)
-st.markdown(
-    "<div style='text-align: center; color: #86868B; font-size: 11px;'>Streamlit & FastAPI</div>",
-    unsafe_allow_html=True
-)
