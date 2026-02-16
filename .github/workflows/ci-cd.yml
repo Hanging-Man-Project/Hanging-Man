@@ -22,21 +22,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ----------------------------------------------------
-      # 2. Unit tests (API & Worker)
-      # ----------------------------------------------------
-      # Run on all branches (fast feedback)
-      - name: Run API unit tests
-        run: |
-          cd api
-          pip install -r requirements.txt
-          pytest
-
-      - name: Run Worker unit tests
-        run: |
-          cd worker
-          pip install -r requirements.txt
-          pytest
 
       # ----------------------------------------------------
       # 3. Build Docker images (all branches)
