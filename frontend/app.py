@@ -3,16 +3,17 @@ import streamlit.components.v1 as components
 import requests
 import time
 
-# Page configuration
+# Configuration de la page
 st.set_page_config(
-    page_title="Hanging Man Game",
+    page_title="Jeu du Pendu",
     page_icon="🎮",
     layout="wide"
 )
 
+# URL de l'API (utilise le nom du service Docker)
 API_URL = "http://proxy:8080"
 
-# Apple CSS Styles 2026 - Optimized Layout
+# Styles CSS Apple 2026 - Layout optimisé
 st.markdown("""
     <style>
     /* Fond général */
@@ -127,7 +128,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Function to draw hangman in minimalist SVG
+# Fonction pour dessiner le pendu en SVG minimaliste
 def draw_hangman_svg(attempts_left, max_attempts=6):
     stages_errors = max_attempts - attempts_left
     
@@ -150,37 +151,37 @@ def draw_hangman_svg(attempts_left, max_attempts=6):
     '''
     
     if stages_errors >= 1:
-        # Head
+        # Tête
         html_content += '<circle cx="140" cy="70" r="20" class="hangman-circle"/>'
     if stages_errors >= 2:
-        # Body
+        # Corps
         html_content += '<line x1="140" y1="90" x2="140" y2="150" class="hangman-line"/>'
     if stages_errors >= 3:
-        # Left arm
+        # Bras gauche
         html_content += '<line x1="140" y1="110" x2="110" y2="130" class="hangman-line"/>'
     if stages_errors >= 4:
-        # Right arm
+        # Bras droit
         html_content += '<line x1="140" y1="110" x2="170" y2="130" class="hangman-line"/>'
     if stages_errors >= 5:
-        # Left leg
+        # Jambe gauche
         html_content += '<line x1="140" y1="150" x2="120" y2="190" class="hangman-line"/>'
     if stages_errors >= 6:
-        # Right leg
+        # Jambe droite
         html_content += '<line x1="140" y1="150" x2="160" y2="190" class="hangman-line"/>'
     
     html_content += '</svg></div>'
     return html_content
 
-# Session initialization
+# Initialisation de la session
 if 'game_id' not in st.session_state:
     st.session_state.game_id = None
 if 'game_status' not in st.session_state:
     st.session_state.game_status = None
 
-# Title centered
+# Titre minimaliste
 st.markdown('<h1 style="text-align: center; color: #1D1D1F; font-weight: 600; font-size: 28px; margin-bottom: 12px; margin-top: 0;">Jeu du Pendu</h1>', unsafe_allow_html=True)
 
-# Sidebar with instructions
+# Sidebar avec instructions
 with st.sidebar:
     st.markdown('<div style="padding: 12px;">', unsafe_allow_html=True)
     st.header("Instructions")
