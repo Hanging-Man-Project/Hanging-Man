@@ -200,8 +200,8 @@ with st.sidebar:
         if response.status_code == 200:
             data = response.json()
             st.metric("Games played", data["total_games"])
-    except:
-        st.error("API non disponible")
+    except Exception as e:
+        pass
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -294,10 +294,10 @@ if st.session_state.game_status:
     col1, col_center, col3 = st.columns([1, 2, 1])
     with col_center:
         if game['status'] == 'won':
-            st.markdown('<div class="status-box win">Bravo ! Vous avez gagné</div>', unsafe_allow_html=True)
+            st.markdown('<div class="status-box win">🎈 Congratulations! You found the word.</div>', unsafe_allow_html=True)
             st.balloons()
         elif game['status'] == 'lost':
-            st.markdown('<div class="status-box lose">Perdu !</div>', unsafe_allow_html=True)
+            st.markdown('<div class="status-box lose">🫵 Loser!</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="status-box in-progress">Game in progress</div>', unsafe_allow_html=True)
 
