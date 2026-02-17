@@ -1,23 +1,35 @@
 # 🎮 Hanging Man Game
 
-A modern, microservices-based Hangman game built with Python, featuring a clean web interface and containerized architecture.
+This project is a containerized implementation of the Hanging Man game, developed as part of the **DevOps & Containerization (M2)** module. 
+It aims to industrialize a web application deployment by focusing on reliability, reproducibility, and security, using a modern microservices architecture and a fully automated CI/CD pipeline.
+
+
+## 👥 Authors
+
+- **Matthieu HOSTE**
+- **Edouard LAMBERT**
+- **Henri OMS**
+
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Project Structure](#project-structure)
-- [Technologies](#technologies)
-- [Authors](#authors)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Security & Best Practices](#-security--best-practices)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [API Endpoints](#-api-endpoints)
+- [Project Structure](#-project-structure)
+- [CI/CD & Versioning Strategy](#-cicd--versioning-strategy)
+- [Technologies](#-technologies)
+
 
 ## 🎯 Overview
 
-This is a full-stack implementation of the classic Hangman word-guessing game. Players attempt to guess a randomly selected word letter by letter, with a limited number of attempts (6 by default). The project demonstrates microservices architecture, containerization, and modern web development practices.
+Players attempt to guess a randomly selected word letter by letter, with a limited number of attempts. The project demonstrates microservices architecture, containerization, and modern web development practices.
+
 
 ## ✨ Features
 
@@ -29,6 +41,7 @@ This is a full-stack implementation of the classic Hangman word-guessing game. P
 - **Microservices Architecture**: Separated concerns with API, Worker, Proxy, and Frontend services
 - **Containerized Deployment**: Easy setup with Docker Compose
 - **Health Monitoring**: Built-in health checks for services
+
 
 ## 🏗️ Architecture
 
@@ -59,6 +72,7 @@ The application consists of four main services:
 - **API**: FastAPI backend handling game logic and state management
 - **Worker**: Service responsible for providing random words for the game
 
+
 ## 🔒 Security & Best Practices
 
 This project implements several security best practices required for modern DevOps standards:
@@ -68,11 +82,13 @@ This project implements several security best practices required for modern DevO
 - **Reverse Proxy**: NGINX acts as a gateway, preventing direct external access to the API backend.
 - **Dependency Management**: Strict version pinning in `requirements.txt` to ensure reproducibility and prevent supply chain attacks.
 
+
 ## 📦 Prerequisites
 
 - Docker
 - Docker Compose
 - (Optional) Python 3.x for local development
+
 
 ## 🚀 Installation
 
@@ -98,6 +114,7 @@ This project implements several security best practices required for modern DevO
    - Proxy: http://localhost:8080
    - API Health: http://localhost:8080/health
 
+
 ## 🎮 Usage
 
 1. Open your browser and navigate to `http://localhost`
@@ -106,6 +123,7 @@ This project implements several security best practices required for modern DevO
 4. Click on letters in the virtual keyboard to make guesses
 5. You have **6 attempts** to guess the word correctly
 6. Win by revealing all letters before running out of attempts!
+
 
 ## 📡 API Endpoints
 
@@ -137,6 +155,7 @@ curl -X POST http://localhost:8080/guess \
   -d '{"game_id": "your-game-id", "letter": "A"}'
 ```
 
+
 ## 📁 Project Structure
 
 ```
@@ -160,6 +179,7 @@ Hanging-Man/
 └── README.md            # This file
 ```
 
+
 ## 🔄 CI/CD & Versioning Strategy
 
 The project uses **GitHub Actions** for continuous integration and deployment:
@@ -175,7 +195,8 @@ The project uses **GitHub Actions** for continuous integration and deployment:
     - `dev`: Active development and testing.
     - `prod`: Stable releases.
 
-## 🛠️ Technologies
+
+## 🛠 Technologies
 
 ### Backend
 - **FastAPI**: Modern, fast web framework for building APIs
@@ -193,19 +214,11 @@ The project uses **GitHub Actions** for continuous integration and deployment:
 - **Docker Compose**: Multi-container orchestration
 - **NGINX**: Reverse proxy and load balancer
 
-## 👥 Authors
-
-- **Matthieu HOSTE**
-- **Edouard LAMBERT**
-- **Henri OMS**
 
 ## 📄 License
 
 This project is open source and available for educational purposes.
 
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
 ## 📝 Notes
 
