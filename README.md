@@ -161,22 +161,22 @@ curl -X POST http://localhost:8080/guess \
 ```
 Hanging-Man/
 ├── api/                    # FastAPI backend service
-│   ├── app.py             # Main API application
-│   ├── Dockerfile         # API container configuration
-│   └── requirements.txt   # Python dependencies
-├── frontend/              # Streamlit frontend service
-│   ├── app.py            # Frontend application
-│   ├── Dockerfile        # Frontend container configuration
-│   └── requirements.txt  # Python dependencies
-├── worker/               # Worker service for word generation
+│   ├── app.py              # Main API application
+│   ├── Dockerfile          # API container configuration
+│   └── requirements.txt    # Python dependencies
+├── frontend/               # Streamlit frontend service
+│   ├── app.py              # Frontend application
+│   ├── Dockerfile          # Frontend container configuration
+│   └── requirements.txt    # Python dependencies
+├── worker/                 # Worker service for word generation
 │   ├── Dockerfile
 │   └── ...
-├── proxy/                # NGINX reverse proxy
+├── proxy/                  # NGINX reverse proxy
 │   ├── Dockerfile
 │   └── ...
-├── docker-compose.yml    # Docker Compose configuration
-├── .env                  # Environment variables
-└── README.md            # This file
+├── docker-compose.yml      # Docker Compose configuration
+├── .env                    # Environment variables
+└── README.md
 ```
 
 
@@ -192,9 +192,9 @@ The project uses **GitHub Actions** for continuous integration and deployment:
 ### Versioning
 - **Docker Tags**: We do not use the `latest` tag. Instead, images are tagged with the **Git Commit SHA** (`${{ github.sha }}`) to ensure traceability and immutability.
 - **Branching**:
+    - `prod` (default): Stable releases.
     - `dev`: Active development and testing.
-    - `prod`: Stable releases.
-
+    
 
 ## 🛠 Technologies
 
@@ -224,7 +224,7 @@ This project is open source and available for educational purposes.
 
 - Games are stored in memory and will be lost when the API container restarts
 - The application uses a bridge network for inter-service communication
-- Health checks are configured with 60-second intervals
+- Health checks are configured with 30-second intervals
 
 ---
 
